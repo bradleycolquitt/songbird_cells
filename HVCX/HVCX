@@ -1,0 +1,1150 @@
+library(tidyverse)
+library(Seurat)
+library(cowplot)
+library(egg)
+library(qs)
+library(Matrix)
+library(colorspace)
+library(dendextend)
+library(pvclust)
+
+#LOAD ZFBF
+#LOAD X
+#HVC_ZF
+#HVC_BF
+#RA_ZF
+#RA_BF
+#X
+#INTEGRATE
+#SCALE DATA
+#RUN PCA
+#PC ELBOW PLOT
+#CLUSTER PLOT
+#RENAME IDENTS
+#REORDER IDENTS
+#CLUSTERPLOT
+#PCT
+#GABA
+#GABA REORDER IDENTS
+#GABA CLUSTERPLOT
+#HIERARCHICAL
+#HEATMAP
+
+#LOAD ZFBF
+ZFBF_seurat_orig <-
+  qread(
+    file.path(
+      "~/OneDrive - University of Texas Southwestern/",
+      "Postdoc/Misc/Data Sharing Test/Brad/data/glut_update/",
+      "obj_integrated_subclustered.qs"
+    )
+  )
+
+ZFBF_seurat <-
+  subset(
+    ZFBF_seurat_orig,
+    subset = cluster_int_sub2 != "ARCO_Glut-1"
+  )
+
+#LOAD X
+load(
+  file = file.path(
+    "~/OneDrive - University of Texas Southwestern/",
+    "Postdoc/Projects/X_FOXP2/Analysis/Cellranger/MCX20/",
+    "MCX20_C_seurat.RData"
+  )
+)
+
+#HVC_ZF
+
+#CELLS
+HVC_ZF <-
+  WhichCells(
+    object = ZFBF_seurat, 
+    expression = (
+      species == "zf" &
+        position == "hvc"
+    )
+  )
+
+#COUNTS
+HVC_ZF_counts <-
+  as(
+    GetAssayData(ZFBF_seurat, slot = "counts", assay = "RNA")[, HVC_ZF], 
+    "sparseMatrix"
+  )
+
+#SEURAT OBJECT
+HVC_ZF_subset <-
+  subset(
+    ZFBF_seurat, 
+    cells = HVC_ZF
+  )
+
+HVC_ZF_seurat <-
+  CreateSeuratObject(
+    counts = HVC_ZF_counts,
+    project = "HVC_ZF"
+  )
+
+HVC_ZF_seurat$dataset <- 
+  "HVC_ZF"
+
+HVC_ZF_seurat$region <-
+  "HVC"
+
+HVC_ZF_seurat$species <-
+  "ZF"
+
+HVC_ZF_seurat$cluster_orig <-
+  FetchData(HVC_ZF_subset, vars = "cluster_int_sub2")
+
+#ADD MITOCHONDRIAL DATA
+HVC_ZF_seurat_mito_genes <- 
+  c(
+    "ATP6",
+    "ATP8",
+    "COX1",
+    "COX2",
+    "COX3",
+    "CYTB",
+    "ND1",
+    "ND2",
+    "ND3",
+    "ND4",
+    "ND4L",
+    "ND5",
+    "ND6"
+  )
+
+HVC_ZF_seurat[["percent.mito"]] <- 
+  PercentageFeatureSet(
+    HVC_ZF_seurat,
+    features = HVC_ZF_seurat_mito_genes
+  )
+
+#NORMALIZE DATA
+HVC_ZF_seurat <-
+  NormalizeData(
+    HVC_ZF_seurat,
+    normalization.method = "LogNormalize",
+    scale.factor = 10000)
+
+#PLOT GENE VARIABILITY
+HVC_ZF_seurat <-
+  FindVariableFeatures(HVC_ZF_seurat)
+
+#HVC_BF
+
+#CELLS
+HVC_BF <-
+  WhichCells(
+    object = ZFBF_seurat, 
+    expression = (
+      species == "bf" &
+        position == "hvc"
+    )
+  )
+
+#COUNTS
+HVC_BF_counts <-
+  as(
+    GetAssayData(ZFBF_seurat, slot = "counts", assay = "RNA")[, HVC_BF], 
+    "sparseMatrix"
+  )
+
+#SEURAT OBJECT
+HVC_BF_subset <-
+  subset(
+    ZFBF_seurat, 
+    cells = HVC_BF
+  )
+
+HVC_BF_seurat <-
+  CreateSeuratObject(
+    counts = HVC_BF_counts,
+    project = "HVC_BF"
+  )
+
+HVC_BF_seurat$dataset <- 
+  "HVC_BF"
+
+HVC_BF_seurat$region <-
+  "HVC"
+
+HVC_BF_seurat$species <-
+  "BF"
+
+HVC_BF_seurat$cluster_orig <-
+  FetchData(HVC_BF_subset, vars = "cluster_int_sub2")
+
+#ADD MITOCHONDRIAL DATA
+HVC_BF_seurat_mito_genes <- 
+  c(
+    "ATP6",
+    "ATP8",
+    "COX1",
+    "COX2",
+    "COX3",
+    "CYTB",
+    "ND1",
+    "ND2",
+    "ND3",
+    "ND4",
+    "ND4L",
+    "ND5",
+    "ND6"
+  )
+
+HVC_BF_seurat[["percent.mito"]] <- 
+  PercentageFeatureSet(
+    HVC_BF_seurat,
+    features = HVC_BF_seurat_mito_genes
+  )
+
+#NORMALIZE DATA
+HVC_BF_seurat <-
+  NormalizeData(
+    HVC_BF_seurat,
+    normalization.method = "LogNormalize",
+    scale.factor = 10000)
+
+#PLOT GENE VARIABILITY
+HVC_BF_seurat <-
+  FindVariableFeatures(HVC_BF_seurat)
+
+#RA_ZF
+
+#CELLS
+RA_ZF <-
+  WhichCells(
+    object = ZFBF_seurat, 
+    expression = (
+      species == "zf" &
+        position == "ra"
+    )
+  )
+
+#COUNTS
+RA_ZF_counts <-
+  as(
+    GetAssayData(ZFBF_seurat, slot = "counts", assay = "RNA")[, RA_ZF], 
+    "sparseMatrix"
+  )
+
+#SEURAT OBJECT
+RA_ZF_subset <-
+  subset(
+    ZFBF_seurat, 
+    cells = RA_ZF
+  )
+
+RA_ZF_seurat <-
+  CreateSeuratObject(
+    counts = RA_ZF_counts,
+    project = "RA_ZF"
+  )
+
+RA_ZF_seurat$dataset <- 
+  "RA_ZF"
+
+RA_ZF_seurat$region <-
+  "RA"
+
+RA_ZF_seurat$species <-
+  "ZF"
+
+RA_ZF_seurat$cluster_orig <-
+  FetchData(RA_ZF_subset, vars = "cluster_int_sub2")
+
+#ADD MITOCHONDRIAL DATA
+RA_ZF_seurat_mito_genes <- 
+  c(
+    "ATP6",
+    "ATP8",
+    "COX1",
+    "COX2",
+    "COX3",
+    "CYTB",
+    "ND1",
+    "ND2",
+    "ND3",
+    "ND4",
+    "ND4L",
+    "ND5",
+    "ND6"
+  )
+
+RA_ZF_seurat[["percent.mito"]] <- 
+  PercentageFeatureSet(
+    RA_ZF_seurat,
+    features = RA_ZF_seurat_mito_genes
+  )
+
+#NORMALIZE DATA
+RA_ZF_seurat <-
+  NormalizeData(
+    RA_ZF_seurat,
+    normalization.method = "LogNormalize",
+    scale.factor = 10000)
+
+#PLOT GENE VARIABILITY
+RA_ZF_seurat <-
+  FindVariableFeatures(RA_ZF_seurat)
+
+#RA_BF
+
+#CELLS
+RA_BF <-
+  WhichCells(
+    object = ZFBF_seurat, 
+    expression = (
+      species == "bf" &
+        position == "ra"
+    )
+  )
+
+#COUNTS
+RA_BF_counts <-
+  as(
+    GetAssayData(ZFBF_seurat, slot = "counts", assay = "RNA")[, RA_BF], 
+    "sparseMatrix"
+  )
+
+#SEURAT OBJECT
+RA_BF_subset <-
+  subset(
+    ZFBF_seurat, 
+    cells = RA_BF
+  )
+
+RA_BF_seurat <-
+  CreateSeuratObject(
+    counts = RA_BF_counts,
+    project = "RA_BF"
+  )
+
+RA_BF_seurat$dataset <- 
+  "RA_BF"
+
+RA_BF_seurat$region <-
+  "RA"
+
+RA_BF_seurat$species <-
+  "BF"
+
+RA_BF_seurat$cluster_orig <-
+  FetchData(RA_BF_subset, vars = "cluster_int_sub2")
+
+#ADD MITOCHONDRIAL DATA
+RA_BF_seurat_mito_genes <- 
+  c(
+    "ATP6",
+    "ATP8",
+    "COX1",
+    "COX2",
+    "COX3",
+    "CYTB",
+    "ND1",
+    "ND2",
+    "ND3",
+    "ND4",
+    "ND4L",
+    "ND5",
+    "ND6"
+  )
+
+RA_BF_seurat[["percent.mito"]] <- 
+  PercentageFeatureSet(
+    RA_BF_seurat,
+    features = RA_BF_seurat_mito_genes
+  )
+
+#NORMALIZE DATA
+RA_BF_seurat <-
+  NormalizeData(
+    RA_BF_seurat,
+    normalization.method = "LogNormalize",
+    scale.factor = 10000)
+
+#PLOT GENE VARIABILITY
+RA_BF_seurat <-
+  FindVariableFeatures(RA_BF_seurat)
+
+#X
+X_counts <-
+  as(
+    GetAssayData(MCX20_C_seurat, slot = "counts", assay = "RNA"), 
+    "sparseMatrix"
+  )
+
+#SEURAT OBJECT
+X_seurat <-
+  CreateSeuratObject(
+    counts = X_counts,
+    project = "X"
+  )
+
+X_seurat$dataset <- 
+  "X"
+
+X_seurat$region <-
+  "X"
+
+X_seurat$species <-
+  "ZF"
+
+X_seurat$cluster_orig <-
+  FetchData(MCX20_C_seurat, vars = "ident")
+
+#ADD MITOCHONDRIAL DATA
+X_seurat_mito_genes <- 
+  c(
+    "ATP6",
+    "ATP8",
+    "COX1",
+    "COX2",
+    "COX3",
+    "CYTB",
+    "ND1",
+    "ND2",
+    "ND3",
+    "ND4",
+    "ND4L",
+    "ND5",
+    "ND6"
+  )
+
+X_seurat[["percent.mito"]] <- 
+  PercentageFeatureSet(
+    X_seurat,
+    features = X_seurat_mito_genes
+  )
+
+#NORMALIZE DATA
+X_seurat <-
+  NormalizeData(
+    X_seurat,
+    normalization.method = "LogNormalize",
+    scale.factor = 10000)
+
+#PLOT GENE VARIABILITY
+X_seurat <-
+  FindVariableFeatures(X_seurat)
+
+#INTEGRATE
+HVCX_seurat_anchors <-
+  FindIntegrationAnchors(
+    object.list = list(
+      HVC_ZF_seurat,
+      HVC_BF_seurat,
+      RA_ZF_seurat,
+      RA_BF_seurat,
+      X_seurat
+    )
+  )
+
+HVCX_seurat <-
+  IntegrateData(
+    anchorset = HVCX_seurat_anchors
+  )
+
+DefaultAssay(HVCX_seurat) <-
+  "integrated"
+
+#SCALE DATA
+HVCX_seurat_REGION <-
+  ScaleData(
+    HVCX_seurat,
+    vars.to.regress = c(
+      "nCount_RNA", "percent.mito", "region"
+    ),
+    model.use ="linear"
+  )
+
+#RUN PCA
+HVCX_seurat_REGION <-
+  RunPCA(
+    HVCX_seurat_REGION,
+    features = VariableFeatures(
+      object = HVCX_seurat_REGION
+    )
+  )
+
+#PC ELBOW PLOT
+ElbowPlot(HVCX_seurat_REGION)
+
+#CLUSTER PLOT
+HVCX_seurat_REGION_res1.1 <- 
+  FindNeighbors(
+    HVCX_seurat_REGION,
+    dims = 1:17
+  )
+
+HVCX_seurat_REGION_res1.1 <-
+  FindClusters(
+    HVCX_seurat_REGION_res1.1,
+    resolution = 1.1,
+  )
+
+HVCX_seurat_REGION_res1.1 <-
+  RunUMAP(
+    HVCX_seurat_REGION_res1.1,
+    dims = 1:17,
+    umap.method = "umap-learn",
+    metric = "correlation"
+  )
+
+#RENAME IDENTS
+HVCX_seurat_REGION_res1.1 <-
+  RenameIdents(
+    HVCX_seurat_REGION_res1.1,
+    "0" = "1",
+    "1" = "2",
+    "2" = "3",
+    "3" = "4",
+    "4" = "5",
+    "5" = "6",
+    "6" = "7",
+    "7" = "8",
+    "8" = "9",
+    "9" = "10",
+    "10" = "11",
+    "11" = "12",
+    "12" = "13",
+    "13" = "14",
+    "14" = "15",
+    "15" = "16",
+    "16" = "17",
+    "17" = "18",
+    "18" = "19",
+    "19" = "20",
+    "20" = "21",
+    "21" = "22",
+    "22" = "23",
+    "23" = "24",
+    "24" = "25",
+    "25" = "26",
+    "26" = "27",
+    "27" = "28",
+    "28" = "29",
+    "29" = "30",
+    "30" = "31",
+    "31" = "32",
+    "32" = "33",
+    "33" = "34",
+    "34" = "35",
+    "35" = "36",
+    "36" = "37",
+    "37" = "38",
+    "38" = "39",
+    "39" = "40",
+    "40" = "41",
+    "41" = "42"
+  )
+
+#REORDER IDENTS
+Idents(HVCX_seurat_REGION_res1.1) <- 
+  factor(
+    Idents(HVCX_seurat_REGION_res1.1),
+    levels = rev(c(
+      1, 5, 10, 29, 7, 23, 34, 40, 
+      2, 3, 8, 11, 35, 16, 38, 12, 13, 27, 37, 19, 
+      31, 17, 22, 14, 41,
+      4, 6, 15, 18, 25, 39, 30, 21, 24, 20, 28, 42, 9, 26, 33, 36, 32
+    ))
+  )
+
+#CLUSTERPLOT
+plot_HVCX_seurat_REGION_res1.1_clusterplot <-
+  UMAPPlot(
+    HVCX_seurat_REGION_res1.1,
+    label = TRUE,
+    label.size = 10,
+    pt.size = 1.5
+  ) +
+  scale_color_manual(
+    values = rev(c(
+      "light blue",
+      "light blue",
+      "light blue",
+      "light blue",
+      "light blue",
+      "light blue",
+      "light blue",
+      "light blue",
+      "red",
+      "red",
+      "red",
+      "red",
+      "orange",
+      "orange",
+      "orange",
+      "orange",
+      "orange",
+      "orange",
+      "orange",
+      "orange",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "pink",
+      "pink",
+      "pink",
+      "light green",
+      "light green",
+      "light green",
+      "light green",
+      "dark green",
+      "dark green",
+      "brown",
+      "brown",
+      "brown",
+      "turquoise",
+      "turquoise",
+      "purple",
+      "purple",
+      "gray"
+    )
+    )
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "none"
+  )
+
+#PCT
+HVCX_seurat_REGION_res1.1_data_tibble <-
+  t(
+    as.matrix(
+      GetAssayData(
+        HVCX_seurat_REGION_res1.1, 
+        slot = "data",
+        assay = "RNA"
+      )
+    )
+  ) %>%
+  as_tibble(rownames = "Cell")
+
+HVCX_seurat_REGION_res1.1_cells <-
+  enframe(Cells(HVCX_seurat_REGION_res1.1), name = NULL) %>%
+  rename("Cell" = value)
+
+HVCX_seurat_REGION_res1.1_clusters <-
+  enframe(Idents(HVCX_seurat_REGION_res1.1), name = NULL) %>%
+  rename("Cluster" = value) 
+
+HVCX_seurat_REGION_res1.1_UMAP <-
+  as_tibble(HVCX_seurat_REGION_res1.1@reductions[["umap"]]@cell.embeddings)
+
+HVCX_seurat_REGION_res1.1_metadata <-
+  FetchData(
+    HVCX_seurat_REGION_res1.1,
+    vars = c(
+      "nCount_RNA",
+      "nFeature_RNA",
+      "percent.mito",
+      "dataset",
+      "region",
+      "species",
+      "cluster_orig"
+    )
+  ) %>%
+  as_tibble()
+
+HVCX_seurat_REGION_res1.1_datatable <-
+  bind_cols(
+    HVCX_seurat_REGION_res1.1_cells,
+    HVCX_seurat_REGION_res1.1_metadata,
+    HVCX_seurat_REGION_res1.1_clusters,
+    HVCX_seurat_REGION_res1.1_UMAP
+  ) %>%
+  rename(
+    UMIs = `nCount_RNA`,
+    Genes = `nFeature_RNA`,
+    PctMito = percent.mito,
+    ClusterMerged = Cluster,
+    ClusterOrig = `cluster_orig`
+  ) %>%
+  add_count(ClusterMerged, name = "ClusterMerged_n") %>%
+  add_count(ClusterOrig, name = "ClusterOrig_n") %>%
+  select(1:11, `ClusterMerged_n`, `ClusterOrig_n`, everything())
+
+HVCX_seurat_REGION_res1.1_datatable <-
+  HVCX_seurat_REGION_res1.1_datatable %>%
+  mutate(
+    ClusterOrig = case_when(
+      ClusterOrig == "0" ~ "1",
+      ClusterOrig == "1" ~ "2",
+      ClusterOrig == "2" ~ "3",
+      ClusterOrig == "3" ~ "4",
+      ClusterOrig == "4" ~ "5",
+      ClusterOrig == "5" ~ "6",
+      ClusterOrig == "6" ~ "7",
+      ClusterOrig == "7" ~ "8",
+      ClusterOrig == "8" ~ "9",
+      ClusterOrig == "9" ~ "10",
+      ClusterOrig == "10" ~ "11",
+      ClusterOrig == "11" ~ "12",
+      ClusterOrig == "12" ~ "13",
+      ClusterOrig == "13" ~ "14",
+      ClusterOrig == "14" ~ "15",
+      ClusterOrig == "15" ~ "16",
+      ClusterOrig == "16" ~ "17",
+      ClusterOrig == "17" ~ "18",
+      ClusterOrig == "18" ~ "19",
+      ClusterOrig == "19" ~ "20",
+      ClusterOrig == "20" ~ "21",
+      ClusterOrig == "21" ~ "22",
+      ClusterOrig == "22" ~ "23",
+      TRUE ~ as.character(ClusterOrig)
+    )
+  )
+
+HVCX_seurat_REGION_res1.1_datatable_pct <-
+  HVCX_seurat_REGION_res1.1_datatable %>%
+  select(1:13) %>%
+  add_count(ClusterMerged, region, name = "nClusterMergedRegion") %>%
+  distinct(ClusterMerged, region, .keep_all = TRUE) %>% 
+  mutate(pct = nClusterMergedRegion / ClusterMerged_n * 100)
+
+plot_HVCX_seurat_REGION_res1.1_pct <-
+  HVCX_seurat_REGION_res1.1_datatable_pct %>%
+  ggplot(
+    aes(
+      x = ClusterMerged,
+      y = pct,
+      fill = region
+    )
+  ) +
+  coord_flip() +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+  ylab("Percentage Composition") +
+  scale_x_discrete(
+    labels = rev(c(
+      "1 (HVC Glut-1/4)",
+      "5 (HVC Glut-2)",
+      "10 (HVC Glut-3)",
+      "29 (HVC Glut-5 & X Glut+ Unknown)",
+      "7 (RA Glut-1/2/3 & HVC Glut-1)",
+      "23 (HVC Glut-1/2)",
+      "34 (X Glut+ INT)",
+      "40 (X Glut+ Unknown)",
+      "2 (X MSN)", 
+      "3 (X MSN)",
+      "8 (X MSN)",
+      "11 (X MSN)",
+      "35 (X PN)",
+      "16 (HVC GABA-1)",
+      "38 (RA GABA-1)",
+      "12 (GABA-2)",
+      "13 (GABA-3/4 & X INT)",
+      "27 (GABA-5 & X INT)",
+      "37 (GABA-6 & X INT)",
+      "19 (GABA-7/8 & X INT)",
+      "31 (Pre-1)",
+      "17 (Pre-2)",
+      "22 (Pre-3)",
+      "14 (Pre-4/5)",
+      "41 (GABA-Pre)",
+      "4 (HVC Astrocyte)",
+      "6 (RA Astrocyte)",
+      "15 (X Astrocyte)",
+      "18 (HVC Oligodendrocyte)",
+      "25 (RA Oligodendrocyte)",
+      "39 (RA Oligodendrocyte)",
+      "30 (X Oligodendrocyte)",
+      "21 (HVC/X Oligo. Precursor)",
+      "24 (RA Oligo. Precursor)",
+      "20 (HVC/X Microglia)",
+      "28 (RA Microglia)",
+      "42 (HVC Microglia)",
+      "9 (HVC/X Endothelial)",
+      "26 (RA Endothelial)",
+      "33 (X RBC)",
+      "36 (HVC/RA RBC)",
+      "32 (HVC/RA Mural)"
+    ))
+  ) +
+  theme(
+    axis.title.x = element_text(size = 24),
+    axis.text.x = element_text(size = 24),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = 24),
+    legend.text = element_text(size = 24),
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.justification = "center",
+    legend.title = element_blank()
+  )
+
+#GABA
+HVCX_seurat_REGION_res1.1_GABA_PRE <-
+  subset(
+    HVCX_seurat_REGION_res1.1,
+    slot = "data",
+    idents = c(
+      2, 3, 8, 11, 35, 16, 38, 12, 13, 27, 37, 19, 41
+    )
+  )
+
+#GABA REORDER IDENTS
+Idents(HVCX_seurat_REGION_res1.1_GABA_PRE) <- 
+  factor(
+    Idents(HVCX_seurat_REGION_res1.1_GABA_PRE),
+    levels = rev(c(
+      2, 3, 8, 11, 35, 16, 38, 12, 13, 37, 19, 27, 41
+    ))
+  )
+
+#GABA CLUSTERPLOT
+HVCX_seurat_REGION_res1.1_GABA_PRE <-
+  RunUMAP(
+    HVCX_seurat_REGION_res1.1_GABA_PRE,
+    dims = 1:17,
+    umap.method = "umap-learn",
+    metric = "correlation"
+  )
+
+plot_HVCX_seurat_REGION_res1.1_GABA_PRE_clusterplot <-
+  UMAPPlot(
+    HVCX_seurat_REGION_res1.1_GABA_PRE,
+    label = TRUE,
+    label.size = 10,
+    pt.size = 1.5
+  ) +
+  scale_color_manual(
+    values = rev(
+      c(
+        "tomato1",
+        "tomato2",
+        "tomato3",
+        "tomato4",
+        "light green",
+        "slateblue",
+        "slateblue4",
+        "darkgoldenrod",
+        "darkgoldenrod1",
+        "darkgoldenrod2",
+        "darkgoldenrod3",
+        "darkgoldenrod4",
+        "turquoise"
+      )
+    )
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    strip.text = element_blank(),
+    legend.position = "none"
+  )
+
+#HIERARCHICAL
+DefaultAssay(HVCX_seurat_REGION_res1.1) <-
+  "RNA"
+
+HVCX_seurat_REGION_res1.1_markers <-
+  as_tibble(
+    FindAllMarkers(
+      HVCX_seurat_REGION_res1.1,
+      assay = "RNA",
+      slot = "data"
+    )
+  )
+
+HVCX_seurat_REGION_res1.1_avexp <- 
+  log1p(
+    AverageExpression(
+      HVCX_seurat_REGION_res1.1
+    )
+    $RNA
+  ) %>%
+  as_tibble(rownames = "gene") 
+
+nsig <- 
+  40
+
+markers_int_top <-
+  HVCX_seurat_REGION_res1.1_markers %>% 
+  mutate(sign = avg_logFC > 0) %>%
+  group_by(cluster, sign) %>%
+  top_n(-1 * nsig, p_val_adj) %>%
+  top_n(nsig, abs(avg_logFC)) %>%
+  ungroup() %>% 
+  distinct(gene, .keep_all = TRUE)
+
+obj_int_avg_filt <-
+  HVCX_seurat_REGION_res1.1_avexp %>%
+  filter(gene %in% markers_int_top$gene)
+
+test_df <-
+  as.data.frame(obj_int_avg_filt)
+
+test_matrix <-
+  data.matrix(test_df)[,-1]
+
+rownames(test_matrix) <-
+  test_df$gene
+
+pv <-
+  pvclust(
+    test_matrix, 
+    method.dist = "correlation",
+    method.hclust = "ward.D",
+    nboot = 200, 
+    parallel = 4L
+  )
+
+plot(pv)
+
+text_colors <-
+  qualitative_hcl(9)
+
+dend <-
+  as.dendrogram(pv)
+
+dend <-
+  dend %>%
+  dendextend::set("branches_k_color", value = text_colors, k = 9) 
+
+dend_gg <-
+  as.ggdend(dend)
+
+dend_seg <-
+  dend_gg$segments
+
+scale_factor = .05
+buffer_size = .1
+position_box_width = 1
+dend_seg = dend_seg %>%
+  mutate(y2 = max(y)-y,
+         yend2 = max(yend) - yend) %>%
+  mutate(y2 = y2 * scale_factor,
+         yend2 = yend2 * scale_factor) %>%
+  mutate(col = if_else(is.na(col), "grey50", col))
+
+tree_width = max(dend_seg$yend2)
+
+dend_leaves <- 
+  dend_gg$labels %>%
+  mutate(
+    test = case_when(
+      label == 1 ~ "1 (HVC Glut-1/4)",
+      label == 5 ~ "5 (HVC Glut-2)",
+      label == 10 ~ "10 (HVC Glut-3)",
+      label == 29 ~ "29 (HVC Glut-5 & X Glut+ Unknown)",
+      label == 7 ~ "7 (RA Glut-1/2/3 & HVC Glut-1)",
+      label == 23 ~ "23 (HVC Glut-1/2)",
+      label == 34 ~ "34 (X Glut+ INT)",
+      label == 40 ~ "40 (X Glut+ Unknown)",
+      label == 2 ~ "2 (X MSN)", 
+      label == 3 ~ "3 (X MSN)",
+      label == 8 ~ "8 (X MSN)",
+      label == 11 ~ "11 (X MSN)",
+      label == 35 ~ "35 (X PN)",
+      label == 16 ~ "16 (HVC GABA-1)",
+      label == 38 ~ "38  (RA GABA-1)",
+      label == 12 ~ "12 (GABA-2)",
+      label == 13 ~ "13 (GABA-3/4 & X INT)",
+      label == 27 ~ "27 (GABA-5 & X INT)",
+      label == 37 ~ "37 (GABA-6 & X INT)",
+      label == 19 ~ "19 (GABA-7/8 & X INT)",
+      label == 31 ~ "31 (Pre-1)",
+      label == 17 ~ "17 (Pre-2)",
+      label == 22 ~ "22 (Pre-3)",
+      label == 14 ~ "14 (Pre-4/5)",
+      label == 41 ~ "41 (GABA-Pre)",
+      label == 4 ~ "4 (HVC Astrocyte)",
+      label == 6 ~ "6 (RA Astrocyte)",
+      label == 15 ~ "15 (X Astrocyte)",
+      label == 18 ~ "18 (HVC Oligodendrocyte)",
+      label == 25 ~ "25 (RA Oligodendrocyte)",
+      label == 39 ~ "39 (RA Oligodendrocyte)",
+      label == 30 ~ "30 (X Oligodendrocyte)",
+      label == 21 ~ "21 (HVC/X Oligo. Precursor)",
+      label == 24 ~ "24 (RA Oligo. Precursor)",
+      label == 20 ~ "20 (HVC/X Microglia)",
+      label == 28 ~ "28 (RA Microglia)",
+      label == 42 ~ "42 (HVC Microglia)",
+      label == 9 ~ "9 (HVC/X Endothelial)",
+      label == 26 ~ "26 (RA Endothelial)",
+      label == 33 ~ "33 (X RBC)",
+      label == 36 ~ "36 (HVC/RA RBC)",
+      label == 32 ~ "32 (HVC/RA Mural)"
+    )
+  )
+
+dend_leaves = dend_leaves %>% 
+  mutate(pos_xmax = x+.4,
+         pos_xmin = x-.4,
+         perc_ymin1 = min(dend_seg$yend) - buffer_size,
+         perc_ymax1 = perc_ymin1 - position_box_width,
+         perc_ymin2 = perc_ymax1 - buffer_size,
+         perc_ymax2 = perc_ymin2 - position_box_width,
+         label_y = perc_ymax2 - buffer_size 
+  )
+
+flat_plot <-
+  ggplot() +
+  geom_segment(data = dend_seg,
+               aes(x = -x,
+                   xend = -xend,
+                   y = -y,
+                   yend = -yend,
+                   color = col
+               ),
+               lineend = "square",
+               size=1) + 
+  coord_flip() +
+  scale_color_identity() + 
+  scale_fill_identity() +
+  expand_limits(y=c(0, 15)) +
+  theme_void() + 
+  theme(legend.position = c(.1, .9)) +
+  geom_text(data = dend_leaves,
+            aes(x=-x,
+                y=label_y,
+                label=test),
+            nudge_y = 2.5,
+            hjust = 0
+  )
+
+#HEATMAP
+HVCX_seurat_REGION_res1.1_heatmap <-
+  HVCX_seurat_REGION_res1.1_datatable %>%
+  select(
+    ClusterMerged,
+    SIX3,
+    FOXP1,
+    FOXP2,
+    ZFHX4,
+    MEIS2,
+    PBX3,
+    TSHZ1,
+    PVALB,
+    ETV1,
+    BCAN,
+    TRPS1,
+    KCNC1,
+    KCNC2,
+    SST,
+    SOX6,
+    LHX6,
+    ARX,
+    SATB1,
+    NPY,
+    EFNA5,
+    ELFN1,
+    CALB1,
+    NR2F2,
+    ADARB2,
+    CNR1,
+    ZBTB16,
+    PROX1,
+    RELN,
+    PENK
+  ) %>%
+  filter(
+    ClusterMerged %in% c(
+      2, 3, 8, 11, 35, 16, 38, 12, 13, 37, 19, 27, 41
+    )
+  ) %>%
+  mutate(
+    ClusterMerged = factor(
+      ClusterMerged,
+      levels = rev(c(
+        2, 3, 8, 11, 35, 16, 38, 12, 13, 37, 19, 27, 41
+      ))
+    )
+  ) %>%
+  pivot_longer(
+    cols = -1,
+    names_to = "Gene", 
+    values_to = "Expression"
+  ) %>%
+  mutate(
+    Gene = factor(
+      Gene,
+      levels = c(
+        "SIX3",
+        "FOXP1",
+        "FOXP2",
+        "ZFHX4",
+        "MEIS2",
+        "PBX3",
+        "TSHZ1",
+        "PVALB",
+        "ETV1",
+        "BCAN",
+        "TRPS1",
+        "KCNC1",
+        "KCNC2",
+        "SST",
+        "SOX6",
+        "LHX6",
+        "ARX",
+        "SATB1",
+        "NPY",
+        "EFNA5",
+        "ELFN1",
+        "CALB1",
+        "NR2F2",
+        "ADARB2",
+        "CNR1",
+        "ZBTB16",
+        "PROX1",
+        "RELN",
+        "PENK"
+      )
+    )
+  ) %>%
+  group_by(Gene, ClusterMerged) %>%
+  mutate(
+    Expression = mean(Expression),
+  ) %>%
+  distinct(ClusterMerged, .keep_all = TRUE)
+
+plot_HVCX_seurat_REGION_res1.1_heatmap <-
+  HVCX_seurat_REGION_res1.1_heatmap %>%
+  ggplot(aes(Gene, ClusterMerged)) +
+  geom_tile(aes(fill = Expression), color = "white") +
+  scale_fill_gradient(
+    name = "Normalized Expression",
+    low = "white",  
+    high = "steelblue",
+    limits = c(0, 5),
+    breaks = c(0, 5)
+  ) +
+  scale_y_discrete(
+    labels = rev(c(
+      "2 (X MSN)", 
+      "3 (X MSN)",
+      "8 (X MSN)",
+      "11 (X MSN)",
+      "35 (X PN)",
+      "16 (HVC GABA-1)",
+      "38 (RA GABA-1)",
+      "12 (GABA-2)",
+      "13 (GABA-3/4 & X INT)",
+      "37 (GABA-6 & X INT)",
+      "19 (GABA-7/8 & X INT)",
+      "27 (GABA-5 & X INT)",
+      "41 (GABA-Pre)"
+    ))
+  ) +
+  theme(
+    axis.text.x = element_text(size = 24, angle = 90, vjust = 0.5),
+    axis.title.x = element_blank(),
+    axis.text.y = element_text(size = 24),
+    axis.title.y = element_blank(),
+    text = element_text(size = 24),
+    legend.position = "top",
+    legend.direction = "horizontal"
+  )
