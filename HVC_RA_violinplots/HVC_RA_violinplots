@@ -1,0 +1,621 @@
+library(tidyverse)
+library(Seurat)
+library(cowplot)
+library(egg)
+library(qs)
+
+#VPall
+#ULDL
+#UL
+#DL
+
+#LOAD ZFBF
+ZFBF_seurat <-
+  qread(
+    file.path(
+      "~/OneDrive - University of Texas Southwestern/",
+      "Postdoc/Projects/HVC_RA/Data/",
+      "obj_integrated_subclustered.qs"
+    )
+  )
+
+Idents(ZFBF_seurat) <-
+  ZFBF_seurat$cluster_int_sub2
+
+#GLUT
+ZFBF_seurat_GLUT <-
+  subset(
+    ZFBF_seurat,
+    idents = c(
+      "HVC_Glut-1",
+      "HVC_Glut-2",
+      "HVC_Glut-3",
+      "HVC_Glut-4",
+      "HVC_Glut-5",
+      "RA_Glut-1",
+      "RA_Glut-2",
+      "RA_Glut-3"
+    )
+  )
+
+#REORDER IDENTS
+Idents(ZFBF_seurat_GLUT) <- 
+  factor(
+    Idents(ZFBF_seurat_GLUT),
+    levels = rev(c(
+      "HVC_Glut-1",
+      "HVC_Glut-2",
+      "HVC_Glut-3",
+      "HVC_Glut-4",
+      "HVC_Glut-5",
+      "RA_Glut-1",
+      "RA_Glut-2",
+      "RA_Glut-3"
+    ))
+  )
+
+#VPall
+VPall <- 
+  c(
+    "NR2F2",
+    "DACH2",
+    "LHX9",
+    "WNT7B",
+    "SEMA5A",
+    "CDH8",
+    "EMX1",
+    "DBX1",
+    "NR4A2"
+  )
+
+VPall_plots <- 
+  lapply(
+    VPall, function(x) {
+      VlnPlot(
+        ZFBF_seurat_GLUT,
+        features = x,
+        pt.size = 0,
+        assay = "RNA",
+        slot = "data"
+      )
+    } +
+      coord_flip() +
+      scale_fill_manual(
+        values = rev(c(
+          "tomato",
+          "tomato", 
+          "tomato",
+          "tomato", 
+          "tomato",
+          "tomato",
+          "tomato",
+          "royal blue",
+          "royal blue",
+          "royal blue"
+        ))
+      ) +
+      theme(
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(size = 24, angle = 0),
+        plot.title = element_text(size = 24, face = "bold.italic"),
+        legend.position = "none"
+      )
+  )
+
+names(VPall_plots) <-
+  VPall
+
+plot_VPall_NR2F2 <-
+  VPall_plots$NR2F2 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall_DACH2 <-
+  VPall_plots$DACH2 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  scale_x_discrete(
+    labels = ZFBF_seurat_GLUT@active.ident
+  ) +
+  labs(
+    y = "Normalized Expression"
+  ) +
+  theme(
+    axis.text.y = element_text(size = 24),
+    axis.title.x = element_text(size = 24)
+  )
+
+plot_VPall_LHX9 <-
+  VPall_plots$LHX9 +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall_WNT7B <-
+  VPall_plots$WNT7B +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall_CDH8 <-
+  VPall_plots$CDH8 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall_SEMA5A <-
+  VPall_plots$SEMA5A +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall_EMX1 <-
+  VPall_plots$EMX1 +
+  scale_y_continuous(
+    limits = c(NA, 1),
+    breaks = c(0, 1)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall_DBX1 <-
+  VPall_plots$DBX1 +
+  scale_y_continuous(
+    limits = c(NA, 2),
+    breaks = c(0, 2)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall_NR4A2 <-
+  VPall_plots$NR4A2 +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_VPall <-
+  ggarrange(
+    plot_VPall_DACH2,
+    plot_VPall_NR2F2,
+    plot_VPall_SEMA5A,
+    plot_VPall_CDH8,
+    plot_VPall_LHX9,
+    plot_VPall_WNT7B,
+    plot_VPall_EMX1,
+    plot_VPall_DBX1,
+    plot_VPall_NR4A2,
+    nrow = 1
+  )
+
+#ULDL
+ULDL <- 
+  c(
+    "RASGRF2",
+    "MEF2C",
+    "EPHA4",
+    "UNC5D",
+    "NEUROD6",
+    "SATB2",
+    "RORB",
+    "SATB1",
+    "NR2F1",
+    "RFX3",
+    "LHX2",
+    "ETV1",
+    "BCL11B",
+    "CDH13",
+    "C1QL3",
+    "TLE4",
+    "NR4A2",
+    "NTSR1",
+    "SOX5",
+    "LMO3",
+    "TCERG1L",
+    "ADCYAP1",
+    "MEIS2",
+    "GNB4",
+    "FOXP2",
+    "TBR1",
+    "NFIA"
+  )
+
+ULDL_plots <- 
+  lapply(
+    ULDL, function(x) {
+      VlnPlot(
+        ZFBF_seurat_GLUT,
+        features = x,
+        pt.size = 0,
+        assay = "RNA",
+        slot = "data"
+      )
+    } +
+      coord_flip() +
+      scale_fill_manual(
+        values = rev(c(
+          "tomato1",
+          "tomato1", 
+          "tomato1",
+          "tomato1", 
+          "tomato1",
+          "tomato1",
+          "tomato1",
+          "royal blue",
+          "royal blue",
+          "royal blue"
+        ))
+      ) +
+      theme(
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(size = 24, angle = 0),
+        plot.title = element_text(size = 24, face = "bold.italic"),
+        legend.position = "none"
+      )
+  )
+
+names(ULDL_plots) <-
+  ULDL
+
+#UL
+plot_ULDL_NR2F1 <-
+  ULDL_plots$NR2F1 +
+  scale_y_continuous(
+    limits = c(NA, 9),
+    breaks = c(0, 9)
+  ) +
+  scale_x_discrete(
+    labels = ZFBF_seurat_GLUT@active.ident
+  ) +
+  labs(
+    y = "Normalized Expression"
+  ) +
+  theme(
+    axis.text.y = element_text(size = 24),
+    axis.title.x = element_text(size = 24)
+  )
+
+plot_ULDL_RASGRF2 <-
+  ULDL_plots$RASGRF2 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_MEF2C <-
+  ULDL_plots$MEF2C +
+  scale_y_continuous(
+    limits = c(NA, 8),
+    breaks = c(0, 8)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_EPHA4 <-
+  ULDL_plots$EPHA4 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_UNC5D <-
+  ULDL_plots$UNC5D +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_NEUROD6 <-
+  ULDL_plots$NEUROD6 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_SATB2 <-
+  ULDL_plots$SATB2 +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_RORB <-
+  ULDL_plots$RORB +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_SATB1 <-
+  ULDL_plots$SATB1 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_RFX3 <-
+  ULDL_plots$RFX3 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_LHX2 <-
+  ULDL_plots$LHX2 +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+#DL
+plot_ULDL_ETV1 <-
+  ULDL_plots$ETV1 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_BCL11B <-
+  ULDL_plots$BCL11B +
+  scale_y_continuous(
+    limits = c(NA, 5),
+    breaks = c(0, 5)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_CDH13 <-
+  ULDL_plots$CDH13 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_C1QL3 <-
+  ULDL_plots$C1QL3 +
+  scale_y_continuous(
+    limits = c(NA, 5),
+    breaks = c(0, 5)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_TLE4 <-
+  ULDL_plots$TLE4 +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_NR4A2 <-
+  ULDL_plots$NR4A2 +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_NTSR1 <-
+  ULDL_plots$NTSR1 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 4)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_SOX5 <-
+  ULDL_plots$SOX5 +
+  scale_y_continuous(
+    limits = c(NA, 6),
+    breaks = c(0, 6)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_LMO3 <-
+  ULDL_plots$LMO3 +
+  scale_y_continuous(
+    limits = c(NA, 4),
+    breaks = c(0, 6)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_TCERG1L <-
+  ULDL_plots$TCERG1L +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_ADCYAP1 <-
+  ULDL_plots$ADCYAP1 +
+  scale_y_continuous(
+    limits = c(NA, 8),
+    breaks = c(0, 8)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_MEIS2 <-
+  ULDL_plots$MEIS2 +
+  scale_y_continuous(
+    limits = c(NA, 5),
+    breaks = c(0, 5)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_GNB4 <-
+  ULDL_plots$GNB4 +
+  scale_y_continuous(
+    limits = c(NA, 3),
+    breaks = c(0, 3)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_TBR1 <-
+  ULDL_plots$TBR1 +
+  scale_y_continuous(
+    limits = c(NA, 5),
+    breaks = c(0, 5)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL_NFIA <-
+  ULDL_plots$NFIA +
+  scale_y_continuous(
+    limits = c(NA, 6),
+    breaks = c(0, 6)
+  ) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  )
+
+plot_ULDL <-
+  ggarrange(
+    plot_ULDL_NR2F1,
+    plot_ULDL_RFX3,
+    plot_ULDL_UNC5D,
+    plot_ULDL_MEF2C,
+    plot_ULDL_SATB1,
+    plot_ULDL_RASGRF2,
+    plot_ULDL_EPHA4,
+    plot_ULDL_NEUROD6,
+    plot_ULDL_RORB,
+    plot_ULDL_SATB2,
+    plot_ULDL_LHX2,
+    plot_ULDL_BCL11B,
+    plot_ULDL_SOX5,
+    plot_ULDL_LMO3,
+    plot_ULDL_MEIS2,
+    plot_ULDL_NFIA,
+    plot_ULDL_TBR1,
+    plot_ULDL_CDH13,
+    plot_ULDL_TLE4,
+    plot_ULDL_GNB4,
+    plot_ULDL_ETV1,
+    plot_ULDL_NR4A2,
+    plot_ULDL_NTSR1,
+    plot_ULDL_C1QL3,
+    plot_ULDL_TCERG1L,
+    plot_ULDL_ADCYAP1,
+    nrow = 1
+  )
