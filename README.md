@@ -1,6 +1,6 @@
 # Songbird single-cell/nucleus transcriptomics
 
-This repository contains R code for analysis and figure generation of songbird single-cell RNA-sequencing
+This repository contains R code for analysis and figure generation of songbird single-cell RNA-sequencing.
 
 ## Directories
 
