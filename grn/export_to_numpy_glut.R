@@ -4,7 +4,6 @@ library(qs)
 library(SCENIC)
 
 source("~/data2/rstudio/birds/utils/go.R")
-#np = import("np")
 
 # Directories -------------------------------------------------------------
 
@@ -16,8 +15,6 @@ dev_out = file.path(dev_dir, "preprocessing", "integrate", "zf_bf", "joint2", "S
 dev_out_sub_dir = file.path(dev_out, sprintf("anchor%s_filter%s_score%s_maxfeatures%s_dims%s", 5, 200, 30, 200, 30))
 
 out_dir = file.path(dev_dir, "grn")
-#script_data_dir = file.path(out_dir, "celltypes_hclust_glut_int_sub2")
-#script_data_sub_dir = file.path(script_data_dir, sub_dir)
 script_name = "export_to_numpy_glut"
 out_dir = file.path(out_dir, script_name)
 dir.create(out_dir, recursive=T)
