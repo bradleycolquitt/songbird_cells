@@ -10,6 +10,8 @@ dataset_comparison - Script that compares the distribution of each cell type bet
 
 grn - Gene regulatory network inference using GRNBoost2. Included are the scripts to export data for analysis (export_to_numpy_glut.R), script to run the Arboreto framework (run_grnboost2_np.py), and post-processing analysis (grnboost2_glut.R)
 
+imaging - Cellprofiler pipelines used for Hiplex ISH analysis
+
 marker_gene - Differential expression analysis
 
 reduction_viz - Dimensionality reduction of different subsets of the data (all cells, glutamatergic neurons, GABAergic neurons) and plotting.
