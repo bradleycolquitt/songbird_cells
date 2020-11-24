@@ -24,3 +24,4 @@ trees - Hierarchical clustering of cell clusters
 
 utils - Several files with utility functions used in other scripts
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4289038.svg)](https://doi.org/10.5281/zenodo.4289038)
