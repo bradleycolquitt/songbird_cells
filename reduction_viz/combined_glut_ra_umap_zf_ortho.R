@@ -128,6 +128,7 @@ genes_to_plot = c("SLC17A6", "NFATC1", "ADAMTS18", "COL6A3")
 Idents(obj_int_filt) = obj_int_filt$cluster_int_sub2
 #Idents(obj_int_filt) = factor(Idents(obj_int_filt), levels=rev(c("RA_GLUT-3", "RA_GLUT-2", "RA_GLUT-1")), labels=c("RA_Glut-3", "RA_Glut-2", "RA_Glut-1"))
 gg = DotPlot(obj_int_filt, features=genes_to_plot, assay="SCT") + 
+  scale_size_area() + 
   labs(x="", y = "")+ coord_flip()
 gg
 save_plot(file.path(figures_dir, "dotplot_manual.pdf"), gg, base_height=2.5)

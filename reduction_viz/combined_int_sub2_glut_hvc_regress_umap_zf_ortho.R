@@ -244,3 +244,74 @@ gg
 save_plot(file.path(figures_dir, "dotplot_vert_full.pdf"), gg, base_height=length(unique(Idents(obj_int_filt)))/2, 
           base_width = length(genes_to_plot))
 
+# Dotplot, cholinergic recepors -----------------------------------------------------------------
+
+#Idents(obj_int_filt) = paste(toupper(obj_int_filt$position2), obj_int_filt$cluster_int_sub2, sep="_")
+Idents(obj_int_filt) = FetchData(obj_int_filt, res_to_use)
+Idents(obj_int_filt) = factor(Idents(obj_int_filt), levels=rev(c("HVC_Glut-1", "HVC_Glut-4",  "HVC_Glut-2", 
+                                                                 "HVC_Glut-3", "HVC_Glut-5")))
+
+DefaultAssay(obj_int_filt) = "SCT"
+genes_to_plot = sort(grep("^CHR[M|N]", rownames(obj_int_filt), value=T))
+gg = DotPlot(obj_int_filt, assay = "SCT", features =  rev(genes_to_plot), col.min = 0, dot.min=.1) +
+  theme(
+    axis.text.x = element_text(angle=30, face="italic", hjust=1),
+    legend.position="bottom",
+    legend.direction="horizontal"
+  ) + 
+  labs(x="", y="") 
+# coord_flip()
+gg
+save_plot(file.path(figures_dir, "dotplot_CHR_vert.pdf"), gg, base_height=length(unique(Idents(obj_int_filt)))/2, 
+          base_width = length(genes_to_plot)/2)
+
+genes_to_plot = rev(sort(grep("^CHRM", rownames(obj_int_filt), value=T)))
+gg = DotPlot(obj_int_filt, assay = "SCT", features =  rev(genes_to_plot), col.min = 0, dot.min=.1) +
+  theme(
+    axis.text.x = element_text(angle=30, face="italic", hjust=1),
+    legend.position="bottom",
+    legend.direction="horizontal"
+  ) + 
+  labs(x="", y="") 
+# coord_flip()
+gg
+save_plot(file.path(figures_dir, "dotplot_CHRM_vert.pdf"), gg, base_height=length(unique(Idents(obj_int_filt)))/2, 
+          base_width = length(genes_to_plot)/2)
+
+Idents(obj_int_filt) = factor(Idents(obj_int_filt), levels=rev(levels(Idents(obj_int_filt))))
+gg = DotPlot(obj_int_filt, assay = "SCT", features =  genes_to_plot, col.min = 0, dot.min=.1) +
+  theme(
+    axis.text.y = element_text(angle=0, face="italic", hjust=1),
+    axis.text.x = element_text(angle=90, hjust=1, vjust=.5),
+    legend.position="bottom",
+    legend.direction="horizontal"
+  ) + 
+  labs(x="", y="") +
+  coord_flip()
+gg
+save_plot(file.path(figures_dir, "dotplot_CHRM_horiz.pdf"), gg, base_width=length(unique(Idents(obj_int_filt)))/2, 
+          base_height = length(genes_to_plot) * .75)
+
+
+save_plot(file.path(figures_dir, "dotplot_CHRM_horiz_legend.pdf"), get_legend(gg), base_width=20, 
+          base_height = 6)
+# genes_to_plot = c("FOSL2", "BDNF", "HOMER1", "UCHL1", 
+#                   "GRM8", "FOXP1", "UTS2B", "NTS",
+#                   "GRIA4", "SLIT3", "MYO5B", "CHRM2", "CACNA1G",
+#                   "TESC", "CDH9", "ADARB2", "GPC5", "DPP10", "GFRA1", "FOXP2", "SCUBE1", 
+#                   "DUSP1", "FOS", "EGR1",
+#                   "GAP43")
+# gg = DotPlot(obj_int_filt, assay = "SCT", features =  rev(genes_to_plot), col.min = 0, dot.min=.1) +
+#   theme(
+#     axis.text.x = element_text(angle=30, face="italic", hjust=1),
+#     legend.position="bottom",
+#     legend.direction="horizontal"
+#   ) + 
+#   labs(x="", y="") 
+# # coord_flip()
+# gg
+# save_plot(file.path(figures_dir, "dotplot_vert_full.pdf"), gg, base_height=length(unique(Idents(obj_int_filt)))/2, 
+#           base_width = length(genes_to_plot))
+# 
+
+

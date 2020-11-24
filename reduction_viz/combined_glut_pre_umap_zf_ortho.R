@@ -141,6 +141,7 @@ genes_to_plot_order = hc_gene$labels[hc_gene$order]
 
 Idents(obj_int_filt_sub) = factor(Idents(obj_int_filt_sub), levels=ct_order)
 gg = DotPlot(obj_int_filt_sub, assay = "SCT", features =  rev(genes_to_plot_order), col.min = 0, dot.min=.1, scale = T) +
+  scale_size_area() + 
   theme(
     axis.text.x = element_text(angle=90, face="italic", hjust=1, vjust=.5),
     legend.position="bottom",
