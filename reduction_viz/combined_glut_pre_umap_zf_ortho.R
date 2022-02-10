@@ -123,11 +123,12 @@ genes_to_plot = unique(genes_to_plot)
 #"TBR2", "DLL3", "EGFR1",
 genes_to_plot = genes_to_plot[!(genes_to_plot %in% c( "SRRT", "HDAC1", "NEUROD1"))]
 #assays_to_use = c( "SCT", "RNA")
+ct_order = c("Pre-1", "Pre-2", "Pre-3", "Pre-4", "HVC_Glut-1", "HVC_Glut-4", "HVC_Glut-2", "HVC_Glut-5", "HVC_Glut-3")
 obj_int_filt_sub = subset(obj_int_filt, idents=ct_order)
 dat = AverageExpression(obj_int_filt, assays = "SCT")
 dat = log1p(dat[["SCT"]])
 dat = dat[,!grepl("RA", colnames(dat))]
-ct_order = c("Pre-1", "Pre-2", "Pre-3", "Pre-4", "HVC_Glut-1", "HVC_Glut-4", "HVC_Glut-2", "HVC_Glut-5", "HVC_Glut-3")
+
 dat = dat[intersect(genes_to_plot, rownames(dat)), ct_order]
 dat_sums = rowSums(dat)
 dat_maxes = apply(dat, 1, max)
@@ -155,5 +156,26 @@ save_plot(file.path(figures_ng_dir, "dotplot_vert.pdf"), gg,
           base_width = length(genes_to_plot_order) /3.5)
 
 save_plot(file.path(figures_ng_dir, "dotplot_vert_legend.pdf"), get_legend(gg),
+          base_height=length(unique(Idents(obj_int_filt_sub))), 
+          base_width = length(genes_to_plot_order))
+
+
+Idents(obj_int_filt_sub) = factor(Idents(obj_int_filt_sub), levels=ct_order)
+gg = DotPlot(obj_int_filt_sub, assay = "SCT", features =  genes_to_plot_order, col.min = 0, dot.min=.1, scale = T) +
+  scale_size_area() + 
+  theme(
+    axis.text.x = element_text(angle=90, hjust=1, vjust=.5),
+    axis.text.y = element_text(face="italic"),
+    legend.position="bottom",
+    legend.direction="horizontal"
+  ) + 
+  labs(x="", y="") +
+  coord_flip()
+gg
+save_plot(file.path(figures_ng_dir, "dotplot_horiz.pdf"), gg,
+          base_width=length(unique(Idents(obj_int_filt_sub))) / 2.5, 
+          base_height = length(genes_to_plot_order) /2.5)
+
+save_plot(file.path(figures_ng_dir, "dotplot_horiz_legend.pdf"), get_legend(gg),
           base_height=length(unique(Idents(obj_int_filt_sub))), 
           base_width = length(genes_to_plot_order))

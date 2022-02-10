@@ -110,7 +110,7 @@ obj_int_filt_avg1 = log1p(obj_int_filt_avg[["SCT"]])
 markers_fname = file.path(tree_dir, sprintf("hvc_ra_x_gaba_rna_markers.rds"))
 redo_markers = T
 if (redo_markers) {
-  Idents(obj_int_filt) = obj_int_filt$region_cluster_orig
+  Idents(obj_int_filt) = obj_int_filt$cluster_orig1
   markers = FindAllMarkers(obj_int_filt, 
                            assay="RNA", 
                            test.use = "wilcox",
@@ -120,7 +120,7 @@ if (redo_markers) {
   markers = readRDS(markers_fname)
 }
 
-
+write.table(markers, file.path(tree_dir, "hvc_ra_x_gaba_rna_markers.txt"), quote=F, col.names=T, sep="\t")
 # Cluster -----------------------------------------------------------------
 
 

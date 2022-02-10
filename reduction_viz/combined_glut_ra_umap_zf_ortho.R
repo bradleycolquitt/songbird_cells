@@ -122,7 +122,7 @@ for (gene in genes_to_plot) {
 
 
 # Dotplot -----------------------------------------------------------------
-s
+
 genes_to_plot = c("SLC17A6",  "COL6A3", "ADAMTS18", "NFATC1")
 genes_to_plot = c("SLC17A6", "NFATC1", "ADAMTS18", "COL6A3")
 Idents(obj_int_filt) = obj_int_filt$cluster_int_sub2

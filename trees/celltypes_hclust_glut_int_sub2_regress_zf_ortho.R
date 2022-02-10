@@ -102,7 +102,9 @@ assay_to_use = "SCT"
 markers_fname = file.path(dev_data_dir, sprintf("marker_genes_cluster_int_sub2_glut_%s.rds", assay_to_use))
 markers_pos_fname = file.path(dev_data_dir, sprintf("marker_genes_cluster_int_sub2_glut_%s_pos.rds", assay_to_use))
 
-redo_markers = T
+markers_export_fname = file.path(tree_dir, sprintf("marker_genes_cluster_int_sub2_glut_%s.txt", assay_to_use))
+
+redo_markers = F
 if (redo_markers) {
   Idents(obj_int_filt) = obj_int_filt@meta.data[,res_to_use]
   DefaultAssay(obj_int_filt) = assay_to_use
@@ -133,6 +135,9 @@ if (redo_markers) {
   markers_int = readRDS(markers_fname)
   markers_int_pos = readRDS(markers_pos_fname)
 }
+
+write.table(markers_int, markers_export_fname, quote=F, sep="\t", row.names=F, col.names=T)
+
 
 Idents(obj_int_filt) = obj_int_filt$cluster_int_sub2
 

@@ -286,6 +286,13 @@ mat_b = log1p(ish_mat2[,colnames(ish_mat2) %in% taxon_md_df1$acronym]) + .1
 obj_cor = region_correlate(mat_a, mat_b, method="spearman")
 
 
+
+# Write out gene list -----------------------------------------------------
+
+gene_df = data.frame(gene = rownames(mat_a))
+write.table(gene_df, file.path(out_dir, "genes_used.txt"), sep="\t", row.names=F, quote=F)
+
+
 # Plot --------------------------------------------------------------------
 
 pdf(file.path(out_dir,"finch_aba_cor.pdf"), height=20, width=5)

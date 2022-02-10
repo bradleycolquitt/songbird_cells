@@ -254,6 +254,7 @@ Idents(obj_int_filt) = factor(Idents(obj_int_filt), levels=rev(c("HVC_Glut-1", "
 DefaultAssay(obj_int_filt) = "SCT"
 genes_to_plot = sort(grep("^CHR[M|N]", rownames(obj_int_filt), value=T))
 gg = DotPlot(obj_int_filt, assay = "SCT", features =  rev(genes_to_plot), col.min = 0, dot.min=.1) +
+  scale_size_area() + 
   theme(
     axis.text.x = element_text(angle=30, face="italic", hjust=1),
     legend.position="bottom",
@@ -267,6 +268,7 @@ save_plot(file.path(figures_dir, "dotplot_CHR_vert.pdf"), gg, base_height=length
 
 genes_to_plot = rev(sort(grep("^CHRM", rownames(obj_int_filt), value=T)))
 gg = DotPlot(obj_int_filt, assay = "SCT", features =  rev(genes_to_plot), col.min = 0, dot.min=.1) +
+  scale_size_area() + 
   theme(
     axis.text.x = element_text(angle=30, face="italic", hjust=1),
     legend.position="bottom",
@@ -280,6 +282,7 @@ save_plot(file.path(figures_dir, "dotplot_CHRM_vert.pdf"), gg, base_height=lengt
 
 Idents(obj_int_filt) = factor(Idents(obj_int_filt), levels=rev(levels(Idents(obj_int_filt))))
 gg = DotPlot(obj_int_filt, assay = "SCT", features =  genes_to_plot, col.min = 0, dot.min=.1) +
+  scale_size_area() + 
   theme(
     axis.text.y = element_text(angle=0, face="italic", hjust=1),
     axis.text.x = element_text(angle=90, hjust=1, vjust=.5),
